@@ -25,7 +25,7 @@ function Get-InstalledPrograms {
 
             # Exibir a lista de programas instalados
             if ($installedPrograms) {
-                Write-Host "Programas instalados em ${computerName}"
+                Write-Host "Programas instalados em $computerName"
                 $installedPrograms | ForEach-Object {
                     Write-Host "$($_.Name) - Versão: $($_.Version)"
                 }
