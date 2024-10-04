@@ -1,27 +1,31 @@
-# Nome do computador remoto
+# Solicitar as credenciais de usuário do Active Directory
+$cred = Get-Credential
+
+# Nome do computador remoto (no seu caso, 'teste')
 $computerName = "emb5022609"
 
 # Função para listar programas instalados
 function Get-InstalledPrograms {
     param (
-        [string]$computerName
+        [string]$computerName,
+        [PSCredential]$cred
     )
     
-    Write-Host "Conectando a $computerName..."
-    
+    Write-Host "Conectando a $computerName usando credenciais do Active Directory..."
+
     try {
-        # Testa a conectividade com o computador remoto
+        # Testar conectividade com o computador remoto
         if (Test-Connection -ComputerName $computerName -Count 1 -Quiet) {
             Write-Host "Listando programas instalados em $computerName..."
 
-            # Usa Invoke-Command para obter a lista de programas instalados remotamente
-            $installedPrograms = Invoke-Command -ComputerName $computerName -ScriptBlock {
+            # Usa Invoke-Command com credenciais do AD para executar remotamente
+            $installedPrograms = Invoke-Command -ComputerName $computerName -Credential $cred -ScriptBlock {
                 Get-WmiObject -Class Win32_Product | Select-Object Name, Version
             }
 
-            # Exibe a lista de programas instalados
+            # Exibir a lista de programas instalados
             if ($installedPrograms) {
-                Write-Host "Programas instalados em ${computerName}:"
+                Write-Host "Programas instalados em ${computerName}"
                 $installedPrograms | ForEach-Object {
                     Write-Host "$($_.Name) - Versão: $($_.Version)"
                 }
@@ -36,7 +40,7 @@ function Get-InstalledPrograms {
     }
 }
 
-# Chama a função para listar programas instalados no computador "teste"
-Get-InstalledPrograms -computerName $computerName
+# Chamar a função para listar programas instalados no computador "teste" usando credenciais do AD
+Get-InstalledPrograms -computerName $computerName -cred $cred
 
 Write-Host "Listagem concluída em $computerName."
